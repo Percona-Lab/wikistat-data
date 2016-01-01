@@ -9,10 +9,7 @@ def load_day(filename, mydate, mymonth):
     # Load a text file and convert each line to a Row.
     d1 = sqlContext.read.format("com.databricks.spark.csv").option("header", "false").option("delimiter"," ").option("quote",chr(0)).load(filename)
     d2=d1.selectExpr(mymonth +" as month", mydate + " as day","upper(C0) as project","lower(C1) as url","cast(C2 as int) as pageview").groupBy("month","day","project","url").agg({"pageview": "sum"}).withColumnRenamed("sum(pageview)", "pageviews")
-    #wiki.count()
-    # Infer the schema, and register the DataFrame as a table.
-    # Save to MySQL
-    # Write to parquet file - if needed
+    # Write to parquet file 
     d2.write.partitionBy("month","day").parquet("/data/flash/spark/wikifull/t16","append")
 mount = "/data/opt/wikistat/"
 d= date(2015, 5, 1)
